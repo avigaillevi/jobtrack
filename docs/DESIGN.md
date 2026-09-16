@@ -93,3 +93,10 @@ Errors: { "error": { "code": "STRING_CODE", "message": "human readable", "detail
 - All list endpoints paginated. Max limit 100.
 - Every request logged as JSON with a request id.
 - Health endpoint used by Docker HEALTHCHECK and by the deploy smoke test.
+
+## 6. Decisions
+1. I chose to use an ENUM because the status field has a predefined and relatively fixed set of values, such as applied, interview, rejected, and accepted. There is no        need to store additional information about each status or manage them dynamically. Using an ENUM also ensures that only valid values can be stored in the column, which     keeps the database simple and consistent. If the statuses become dynamic in the future or need additional information, such as a name, description, or order, I would       consider moving them to a separate table.
+   
+2. I chose to store `events` in a separate table because there can be multiple events associated with the same record, so this is a one-to-many relationship. A separate       table makes it easier to query, filter, sort, and index events efficiently. It also allows us to define a clear relationship with the main table using a foreign key and    maintain data integrity. If we stored the events as JSON, querying and indexing individual events would be more difficult, and the database structure would be less         relational.
+
+3. I chose offset pagination because the amount of data in the current project is relatively small, and users may need to navigate between pages. Offset pagination is         simpler to implement and understand, and it also allows users to jump directly to a specific page. Cursor pagination would be a better choice for very large datasets or    frequently changing data, but for the current requirements of the project, offset pagination provides a simple solution with sufficient performance.
